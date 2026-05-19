@@ -9,13 +9,14 @@ import Dashboard from "../pages/Dashboard";
 import Home from "../pages/Home";
 
 const router = createBrowserRouter([
+    
   {
     path: "/",
     element: <MainLayout />,
     children: [
       {
         index: true,
-        element: <Login />, // Login becomes default page
+        element: <Login />, 
       },
       {
         path: "home",
