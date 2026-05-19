@@ -3,16 +3,28 @@ import AuthReducer from "./AuthReducer";
 import {
   loginStart, loginSuccess, loginFailure,
   registerStart, registerSuccess, registerFailure,
-  logout as logoutAction, clearError, updateUser,
+  logout as logoutAction,
+  clearError,
+  updateUser,
 } from "./AuthActions";
+import { authService } from "../api/authService";
+
+// ─── Storage helpers ──────────────────────────────────────────────────────────
 
 const TOKEN_KEY = "overdrive_token";
 const USER_KEY  = "overdrive_user";
 
 const getStoredToken = () => localStorage.getItem(TOKEN_KEY) || null;
 const getStoredUser  = () => {
-  try { return JSON.parse(localStorage.getItem(USER_KEY)); } catch { return null; }
+  try {
+    const u = localStorage.getItem(USER_KEY);
+    return u ? JSON.parse(u) : null;
+  } catch {
+    return null;
+  }
 };
+
+// ─── Initial state (rehydrated from localStorage) ────────────────────────────
 
 const storedToken = getStoredToken();
 const storedUser  = getStoredUser();
@@ -25,7 +37,11 @@ const initialState = {
   error: null,
 };
 
+// ─── Context ──────────────────────────────────────────────────────────────────
+
 export const AuthContext = createContext(initialState);
+
+// ─── Provider ─────────────────────────────────────────────────────────────────
 
 export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(AuthReducer, initialState);
@@ -33,15 +49,13 @@ export const AuthProvider = ({ children }) => {
   const login = useCallback(async (email, password) => {
     dispatch(loginStart());
     try {
-      const res  = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Login failed.");
+      // authService.login calls POST /api/auth/login
+      // Expected response: { token, user }
+      const data = await authService.login(email, password);
+
       localStorage.setItem(TOKEN_KEY, data.token);
       localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+
       dispatch(loginSuccess(data.user));
       return { success: true };
     } catch (err) {
@@ -53,15 +67,13 @@ export const AuthProvider = ({ children }) => {
   const register = useCallback(async (name, email, password) => {
     dispatch(registerStart());
     try {
-      const res  = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/auth/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Registration failed.");
+      // authService.register calls POST /api/auth/register
+      // Expected response: { token, user }
+      const data = await authService.register(name, email, password);
+
       localStorage.setItem(TOKEN_KEY, data.token);
       localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+
       dispatch(registerSuccess(data.user));
       return { success: true };
     } catch (err) {
@@ -76,27 +88,41 @@ export const AuthProvider = ({ children }) => {
     dispatch(logoutAction());
   }, []);
 
-  const clearAuthError    = useCallback(() => dispatch(clearError()), []);
-  const updateUserProfile = useCallback((fields) => {
-    const updated = { ...state.user, ...fields };
-    localStorage.setItem(USER_KEY, JSON.stringify(updated));
-    dispatch(updateUser(fields));
-  }, [state.user]);
+  const clearAuthError = useCallback(() => dispatch(clearError()), []);
+
+  const updateUserProfile = useCallback(
+    (fields) => {
+      const updated = { ...state.user, ...fields };
+      localStorage.setItem(USER_KEY, JSON.stringify(updated));
+      dispatch(updateUser(fields));
+    },
+    [state.user]
+  );
 
   return (
-    <AuthContext.Provider value={{
-      user: state.user, token: state.token,
-      isAuthenticated: state.isAuthenticated,
-      loading: state.loading, error: state.error,
-      login, register, logout: logoutUser, clearAuthError, updateUserProfile,
-    }}>
+    <AuthContext.Provider
+      value={{
+        user: state.user,
+        token: state.token,
+        isAuthenticated: state.isAuthenticated,
+        loading: state.loading,
+        error: state.error,
+        login,
+        register,
+        logout: logoutUser,
+        clearAuthError,
+        updateUserProfile,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
+// ─── Custom hook ──────────────────────────────────────────────────────────────
+
 export const useAuth = () => {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used within an AuthProvider");
-  return ctx;
+  const context = useContext(AuthContext);
+  if (!context) throw new Error("useAuth must be used within an AuthProvider");
+  return context;
 };

@@ -10,12 +10,14 @@ export const AUTH_ACTIONS = {
   UPDATE_USER: "UPDATE_USER",
 };
 
-export const loginStart    = () => ({ type: AUTH_ACTIONS.LOGIN_START });
-export const loginSuccess  = (user) => ({ type: AUTH_ACTIONS.LOGIN_SUCCESS, payload: user });
-export const loginFailure  = (err)  => ({ type: AUTH_ACTIONS.LOGIN_FAILURE, payload: err });
-export const registerStart   = () => ({ type: AUTH_ACTIONS.REGISTER_START });
+export const loginStart = () => ({ type: AUTH_ACTIONS.LOGIN_START });
+export const loginSuccess = (user) => ({ type: AUTH_ACTIONS.LOGIN_SUCCESS, payload: user });
+export const loginFailure = (error) => ({ type: AUTH_ACTIONS.LOGIN_FAILURE, payload: error });
+
+export const registerStart = () => ({ type: AUTH_ACTIONS.REGISTER_START });
 export const registerSuccess = (user) => ({ type: AUTH_ACTIONS.REGISTER_SUCCESS, payload: user });
-export const registerFailure = (err)  => ({ type: AUTH_ACTIONS.REGISTER_FAILURE, payload: err });
-export const logout      = () => ({ type: AUTH_ACTIONS.LOGOUT });
-export const clearError  = () => ({ type: AUTH_ACTIONS.CLEAR_ERROR });
-export const updateUser  = (user) => ({ type: AUTH_ACTIONS.UPDATE_USER, payload: user });
+export const registerFailure = (error) => ({ type: AUTH_ACTIONS.REGISTER_FAILURE, payload: error });
+
+export const logout = () => ({ type: AUTH_ACTIONS.LOGOUT });
+export const clearError = () => ({ type: AUTH_ACTIONS.CLEAR_ERROR });
+export const updateUser = (user) => ({ type: AUTH_ACTIONS.UPDATE_USER, payload: user });
