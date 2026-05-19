@@ -1,104 +1,67 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../Context/AuthContext";
-import { useToast } from "../Context/ToastContext";
-import { ErrorMessage, FieldError } from "../components/errors/ErrorMessage";
-
-// ─── Field-level validation ───────────────────────────────────────────────────
-
-function validate({ name, email, password, confirmPassword }) {
-  const errors = {};
-
-  if (!name || name.trim().length < 2)
-    errors.name = "Full name must be at least 2 characters.";
-
-  if (!email)
-    errors.email = "Email is required.";
-  else if (!/\S+@\S+\.\S+/.test(email))
-    errors.email = "Enter a valid email address.";
-
-  if (!password)
-    errors.password = "Password is required.";
-  else if (password.length < 6)
-    errors.password = "Password must be at least 6 characters.";
-
-  if (!confirmPassword)
-    errors.confirmPassword = "Please confirm your password.";
-  else if (password && confirmPassword !== password)
-    errors.confirmPassword = "Passwords do not match.";
-
-  return errors;
-}
-
-// ─── Component ────────────────────────────────────────────────────────────────
 
 function Register() {
   const { register, loading, error, isAuthenticated, clearAuthError } = useAuth();
-  const { showToast } = useToast();
-  const navigate      = useNavigate();
+  const navigate = useNavigate();
 
-  const [formData, setFormData]       = useState({ name: "", email: "", password: "", confirmPassword: "" });
-  const [fieldErrors, setFieldErrors] = useState({});
-  const [touched, setTouched]         = useState({});
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [validationError, setValidationError] = useState("");
 
+  // Already logged in? Skip this page
   useEffect(() => {
     if (isAuthenticated) navigate("/dashboard", { replace: true });
   }, [isAuthenticated, navigate]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
     clearAuthError();
-    setFormData((prev) => ({ ...prev, [name]: value }));
-
-    if (touched[name]) {
-      const errs = validate({ ...formData, [name]: value });
-      setFieldErrors((prev) => ({ ...prev, [name]: errs[name] || "" }));
-    }
-  };
-
-  const handleBlur = (e) => {
-    const { name } = e.target;
-    setTouched((prev) => ({ ...prev, [name]: true }));
-    const errs = validate(formData);
-    setFieldErrors((prev) => ({ ...prev, [name]: errs[name] || "" }));
+    setValidationError("");
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setTouched({ name: true, email: true, password: true, confirmPassword: true });
-    const errs = validate(formData);
-    setFieldErrors(errs);
-    if (Object.keys(errs).length > 0) return;
+    const { name, email, password, confirmPassword } = formData;
 
-    const result = await register(formData.name, formData.email, formData.password);
-
-    if (result.success) {
-      showToast("Account created! Welcome to Over Drive.", "success");
-      navigate("/dashboard", { replace: true });
-    } else {
-      showToast(result.error || "Registration failed.", "error");
+    if (password !== confirmPassword) {
+      setValidationError("Passwords do not match.");
+      return;
     }
+    if (password.length < 6) {
+      setValidationError("Password must be at least 6 characters.");
+      return;
+    }
+
+    const result = await register(name, email, password);
+    if (result.success) navigate("/dashboard", { replace: true });
   };
+
+  const displayError = validationError || error;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#EEF2F5] px-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
 
-        <div className="mb-6 text-center">
+        <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold text-gray-800">Create Account</h1>
           <p className="text-gray-500 mt-2">Join Over Drive today</p>
         </div>
 
-        {/* API / server error banner */}
-        <ErrorMessage
-          message={error}
-          onDismiss={clearAuthError}
-          className="mb-6"
-        />
+        {/* Error banner */}
+        {displayError && (
+          <div className="mb-5 p-3 bg-red-100 border border-red-300 text-red-700 rounded-xl text-sm">
+            {displayError}
+          </div>
+        )}
 
-        <form onSubmit={handleSubmit} noValidate className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-5">
 
-          {/* Full Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
             <input
@@ -106,17 +69,13 @@ function Register() {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              onBlur={handleBlur}
               placeholder="Enter your full name"
-              aria-invalid={!!fieldErrors.name}
-              className={`w-full px-4 py-3 border rounded-xl outline-none focus:ring-2 focus:ring-black transition ${
-                fieldErrors.name ? "border-red-400 focus:ring-red-300" : "border-gray-300"
-              }`}
+              required
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-black"
             />
             <FieldError message={fieldErrors.name} />
           </div>
 
-          {/* Email */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
             <input
@@ -124,17 +83,13 @@ function Register() {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              onBlur={handleBlur}
               placeholder="Enter your email"
-              aria-invalid={!!fieldErrors.email}
-              className={`w-full px-4 py-3 border rounded-xl outline-none focus:ring-2 focus:ring-black transition ${
-                fieldErrors.email ? "border-red-400 focus:ring-red-300" : "border-gray-300"
-              }`}
+              required
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-black"
             />
             <FieldError message={fieldErrors.email} />
           </div>
 
-          {/* Password */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
             <input
@@ -142,17 +97,13 @@ function Register() {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              onBlur={handleBlur}
               placeholder="Create a password (min. 6 characters)"
-              aria-invalid={!!fieldErrors.password}
-              className={`w-full px-4 py-3 border rounded-xl outline-none focus:ring-2 focus:ring-black transition ${
-                fieldErrors.password ? "border-red-400 focus:ring-red-300" : "border-gray-300"
-              }`}
+              required
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-black"
             />
             <FieldError message={fieldErrors.password} />
           </div>
 
-          {/* Confirm Password */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
             <input
@@ -160,17 +111,13 @@ function Register() {
               name="confirmPassword"
               value={formData.confirmPassword}
               onChange={handleChange}
-              onBlur={handleBlur}
               placeholder="Confirm your password"
-              aria-invalid={!!fieldErrors.confirmPassword}
-              className={`w-full px-4 py-3 border rounded-xl outline-none focus:ring-2 focus:ring-black transition ${
-                fieldErrors.confirmPassword ? "border-red-400 focus:ring-red-300" : "border-gray-300"
-              }`}
+              required
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-black"
             />
             <FieldError message={fieldErrors.confirmPassword} />
           </div>
 
-          {/* Submit */}
           <button
             type="submit"
             disabled={loading}
