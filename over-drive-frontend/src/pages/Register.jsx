@@ -73,6 +73,7 @@ function Register() {
               required
               className="w-full px-4 py-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-black"
             />
+            <FieldError message={fieldErrors.name} />
           </div>
 
           <div>
@@ -86,6 +87,7 @@ function Register() {
               required
               className="w-full px-4 py-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-black"
             />
+            <FieldError message={fieldErrors.email} />
           </div>
 
           <div>
@@ -99,6 +101,7 @@ function Register() {
               required
               className="w-full px-4 py-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-black"
             />
+            <FieldError message={fieldErrors.password} />
           </div>
 
           <div>
@@ -112,6 +115,7 @@ function Register() {
               required
               className="w-full px-4 py-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-black"
             />
+            <FieldError message={fieldErrors.confirmPassword} />
           </div>
 
           <button

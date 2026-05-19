@@ -126,7 +126,7 @@ function Login() {
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <button className="border border-gray-300 rounded-2xl py-3 bg-white/50 hover:bg-white transition">
+          <button className="border border-gray-300 rounded-2xl py-3 bg-white/50 hover:bg-white transition text-sm">
             Google
           </button>
           <button className="border border-gray-300 rounded-2xl py-3 bg-white/50 hover:bg-white transition">
