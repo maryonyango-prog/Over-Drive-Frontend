@@ -79,7 +79,7 @@ function Login() {
               onChange={handleChange}
               placeholder="you@example.com"
               required
-              className="w-full p-4 rounded-2xl border border-gray-300 bg-white/50 outline-none focus:ring-2 focus:ring-cyan-400"
+              className="w-full p-4 rounded-2xl border border-gray-300 bg-white/50 outline-none focus:ring-2 focus:ring-cyan-400 text-gray-900 placeholder-gray-400"
             />
           </div>
 
@@ -93,7 +93,7 @@ function Login() {
               onChange={handleChange}
               placeholder="********"
               required
-              className="w-full p-4 rounded-2xl border border-gray-300 bg-white/50 outline-none focus:ring-2 focus:ring-cyan-400"
+              className="w-full p-4 rounded-2xl border border-gray-300 bg-white/50 outline-none focus:ring-2 focus:ring-cyan-400 text-gray-900 placeholder-gray-400"
             />
           </div>
 

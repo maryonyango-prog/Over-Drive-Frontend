@@ -32,10 +32,10 @@ const conditionColors = {
 
 function StatSkeleton() {
   return (
-    <div className="bg-white rounded-2xl p-5 border border-gray-100 animate-pulse">
-      <div className="h-3 w-20 bg-gray-200 rounded mb-3" />
-      <div className="h-7 w-28 bg-gray-200 rounded mb-2" />
-      <div className="h-3 w-16 bg-gray-100 rounded" />
+    <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 animate-pulse">
+      <div className="h-3 w-20 bg-gray-200 dark:bg-gray-700 rounded mb-3" />
+      <div className="h-7 w-28 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
+      <div className="h-3 w-16 bg-gray-100 dark:bg-gray-700 rounded" />
     </div>
   );
 }
@@ -59,14 +59,14 @@ function RecentSkeleton() {
 
 function StatCard({ label, value, sub, icon, accent }) {
   return (
-    <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex items-start gap-4">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 shadow-sm flex items-start gap-4">
       <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${accent}`}>
         {icon}
       </div>
       <div>
-        <p className="text-xs text-gray-400 mb-1">{label}</p>
-        <p className="text-2xl font-bold text-gray-900">{value}</p>
-        {sub && <p className="text-xs text-gray-400 mt-1">{sub}</p>}
+        <p className="text-xs text-gray-400 dark:text-gray-500 mb-1">{label}</p>
+        <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{value}</p>
+        {sub && <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{sub}</p>}
       </div>
     </div>
   );
@@ -78,19 +78,19 @@ function RecentRow({ item }) {
   const conditionClass = conditionColors[item.condition] || "bg-gray-100 text-gray-600";
 
   return (
-    <div className="flex items-center justify-between py-4 border-b border-gray-50 last:border-0">
+    <div className="flex items-center justify-between py-4 border-b border-gray-50 dark:border-gray-700 last:border-0">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-cyan-50 flex items-center justify-center flex-shrink-0">
+        <div className="w-10 h-10 rounded-xl bg-cyan-50 dark:bg-cyan-900/30 flex items-center justify-center flex-shrink-0">
           <svg className="w-5 h-5 text-cyan-500" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
           </svg>
         </div>
         <div>
-          <p className="text-sm font-medium text-gray-900">
+          <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
             {item.year} {item.make} {item.model}
           </p>
           <div className="flex items-center gap-2 mt-0.5">
-            <span className="text-xs text-gray-400">{formatDate(item.createdAt)}</span>
+            <span className="text-xs text-gray-400 dark:text-gray-500">{formatDate(item.createdAt)}</span>
             {item.condition && (
               <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${conditionClass}`}>
                 {item.condition}
@@ -99,7 +99,7 @@ function RecentRow({ item }) {
           </div>
         </div>
       </div>
-      <span className="text-sm font-bold text-gray-900 flex-shrink-0">
+      <span className="text-sm font-bold text-gray-900 dark:text-gray-100 flex-shrink-0">
         {formatCurrency(item.estimatedValue)}
       </span>
     </div>
@@ -151,10 +151,10 @@ function Dashboard() {
       {/* ── Header ── */}
       <div className="flex items-start justify-between mb-8 flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
             {greeting}, {user?.name?.split(" ")[0] || "there"} 👋
           </h1>
-          <p className="text-gray-500 mt-1 text-sm">
+          <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm">
             Here's an overview of your vehicle valuations.
           </p>
         </div>
@@ -218,9 +218,9 @@ function Dashboard() {
       </div>
 
       {/* ── Recent valuations ── */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <h2 className="font-semibold text-gray-900">Recent Valuations</h2>
+      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-700">
+          <h2 className="font-semibold text-gray-900 dark:text-gray-100">Recent Valuations</h2>
           {totalValuations > 5 && (
             <Link
               to="/history"
@@ -241,18 +241,18 @@ function Dashboard() {
           )}
 
           {!loading && error && (
-            <p className="text-sm text-red-500 py-6">{error}</p>
+            <p className="text-sm text-red-500 dark:text-red-400 py-6">{error}</p>
           )}
 
           {!loading && !error && recentItems.length === 0 && (
             <div className="flex flex-col items-center justify-center py-12 text-center">
-              <div className="w-14 h-14 rounded-full bg-cyan-50 flex items-center justify-center mb-4">
+              <div className="w-14 h-14 rounded-full bg-cyan-50 dark:bg-cyan-900/30 flex items-center justify-center mb-4">
                 <svg className="w-7 h-7 text-cyan-400" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
                 </svg>
               </div>
-              <p className="text-sm font-medium text-gray-700 mb-1">No valuations yet</p>
-              <p className="text-xs text-gray-400 mb-4">
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">No valuations yet</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">
                 Get an AI-powered estimate for your vehicle in seconds.
               </p>
               <Link
@@ -276,31 +276,31 @@ function Dashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
         <Link
           to="/valuate"
-          className="flex items-center gap-4 bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-cyan-200 transition group"
+          className="flex items-center gap-4 bg-white dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md hover:border-cyan-200 dark:hover:border-cyan-800 transition group"
         >
-          <div className="w-11 h-11 rounded-xl bg-cyan-50 flex items-center justify-center group-hover:bg-cyan-100 transition">
+          <div className="w-11 h-11 rounded-xl bg-cyan-50 dark:bg-cyan-900/30 flex items-center justify-center group-hover:bg-cyan-100 dark:group-hover:bg-cyan-900/50 transition">
             <svg className="w-5 h-5 text-cyan-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
             </svg>
           </div>
           <div>
-            <p className="font-semibold text-gray-900 text-sm">New Valuation</p>
-            <p className="text-xs text-gray-400 mt-0.5">Get an AI estimate for a vehicle</p>
+            <p className="font-semibold text-gray-900 dark:text-gray-100 text-sm">New Valuation</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Get an AI estimate for a vehicle</p>
           </div>
         </Link>
 
         <Link
           to="/history"
-          className="flex items-center gap-4 bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-cyan-200 transition group"
+          className="flex items-center gap-4 bg-white dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md hover:border-cyan-200 dark:hover:border-cyan-800 transition group"
         >
-          <div className="w-11 h-11 rounded-xl bg-purple-50 flex items-center justify-center group-hover:bg-purple-100 transition">
+          <div className="w-11 h-11 rounded-xl bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center group-hover:bg-purple-100 dark:group-hover:bg-purple-900/50 transition">
             <svg className="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
           <div>
-            <p className="font-semibold text-gray-900 text-sm">View History</p>
-            <p className="text-xs text-gray-400 mt-0.5">Browse all past valuations</p>
+            <p className="font-semibold text-gray-900 dark:text-gray-100 text-sm">View History</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Browse all past valuations</p>
           </div>
         </Link>
       </div>

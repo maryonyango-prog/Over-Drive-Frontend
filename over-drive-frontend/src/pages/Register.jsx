@@ -85,7 +85,7 @@ function Register() {
   };
 
   const inputClass = (field) =>
-    `w-full px-4 py-3 border rounded-xl outline-none focus:ring-2 transition text-sm ${
+    `w-full px-4 py-3 border rounded-xl outline-none focus:ring-2 transition text-sm text-gray-900 placeholder-gray-400 ${
       fieldErrors[field]
         ? "border-red-400 focus:ring-red-300"
         : "border-gray-300 focus:ring-black"

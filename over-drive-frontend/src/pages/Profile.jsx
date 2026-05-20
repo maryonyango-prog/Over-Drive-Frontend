@@ -30,7 +30,7 @@ function Field({ label, children }) {
 }
 
 const inputClass =
-  "w-full px-4 py-3 border border-gray-300 rounded-xl outline-none text-sm focus:ring-2 focus:ring-cyan-400 transition";
+  "w-full px-4 py-3 border border-gray-300 rounded-xl outline-none text-sm text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-cyan-400 transition";
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 

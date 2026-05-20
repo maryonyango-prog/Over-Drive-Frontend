@@ -5,10 +5,10 @@ import { useAuth } from "../Context/AuthContext";
 
 function Section({ title, description, children }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-      <div className="mb-5 pb-4 border-b border-gray-100">
-        <h2 className="font-semibold text-gray-900">{title}</h2>
-        {description && <p className="text-xs text-gray-400 mt-0.5">{description}</p>}
+    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-6">
+      <div className="mb-5 pb-4 border-b border-gray-100 dark:border-gray-700">
+        <h2 className="font-semibold text-gray-900 dark:text-gray-100">{title}</h2>
+        {description && <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{description}</p>}
       </div>
       {children}
     </div>
@@ -19,10 +19,10 @@ function Section({ title, description, children }) {
 
 function ToggleRow({ label, description, checked, onChange }) {
   return (
-    <div className="flex items-start justify-between gap-4 py-3 border-b border-gray-50 last:border-0">
+    <div className="flex items-start justify-between gap-4 py-3 border-b border-gray-50 dark:border-gray-700 last:border-0">
       <div className="flex-1">
-        <p className="text-sm font-medium text-gray-800">{label}</p>
-        {description && <p className="text-xs text-gray-400 mt-0.5">{description}</p>}
+        <p className="text-sm font-medium text-gray-800 dark:text-gray-200">{label}</p>
+        {description && <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{description}</p>}
       </div>
       <button
         type="button"
@@ -30,7 +30,7 @@ function ToggleRow({ label, description, checked, onChange }) {
         aria-checked={checked}
         onClick={() => onChange(!checked)}
         className={`relative inline-flex h-6 w-11 flex-shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none ${
-          checked ? "bg-cyan-400" : "bg-gray-200"
+          checked ? "bg-cyan-400" : "bg-gray-200 dark:bg-gray-600"
         }`}
       >
         <span
@@ -47,18 +47,18 @@ function ToggleRow({ label, description, checked, onChange }) {
 
 function SelectRow({ label, description, value, options, onChange }) {
   return (
-    <div className="flex items-start justify-between gap-4 py-3 border-b border-gray-50 last:border-0">
+    <div className="flex items-start justify-between gap-4 py-3 border-b border-gray-50 dark:border-gray-700 last:border-0">
       <div className="flex-1">
-        <p className="text-sm font-medium text-gray-800">{label}</p>
-        {description && <p className="text-xs text-gray-400 mt-0.5">{description}</p>}
+        <p className="text-sm font-medium text-gray-800 dark:text-gray-200">{label}</p>
+        {description && <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{description}</p>}
       </div>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 outline-none focus:ring-2 focus:ring-cyan-400 bg-white text-gray-700"
+        className="text-sm border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-1.5 outline-none focus:ring-2 focus:ring-cyan-400 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200"
       >
         {options.map(({ value: v, label: l }) => (
-          <option key={v} value={v}>{l}</option>
+          <option key={v} value={v} className="bg-white dark:bg-gray-700">{l}</option>
         ))}
       </select>
     </div>
@@ -108,8 +108,8 @@ function Settings() {
       {/* Header */}
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-          <p className="text-gray-500 mt-1 text-sm">Manage your preferences and notifications.</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Settings</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm">Manage your preferences and notifications.</p>
         </div>
         <button
           onClick={handleSave}
@@ -214,14 +214,14 @@ function Settings() {
       <Section title="Session">
         <div className="flex items-center justify-between py-2">
           <div>
-            <p className="text-sm font-medium text-gray-800">Sign out of all devices</p>
-            <p className="text-xs text-gray-400 mt-0.5">
+            <p className="text-sm font-medium text-gray-800 dark:text-gray-200">Sign out of all devices</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
               This will log you out everywhere and clear your session.
             </p>
           </div>
           <button
             onClick={logout}
-            className="px-4 py-2 rounded-xl border border-red-200 text-red-500 hover:bg-red-50 text-sm font-medium transition"
+            className="px-4 py-2 rounded-xl border border-red-200 dark:border-red-800 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 text-sm font-medium transition"
           >
             Sign Out
           </button>

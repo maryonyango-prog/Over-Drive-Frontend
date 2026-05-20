@@ -71,12 +71,12 @@ function Field({ label, error, children }) {
 }
 
 const inputClass = (hasError) =>
-  `w-full px-4 py-3 border rounded-xl outline-none text-sm transition focus:ring-2 focus:ring-cyan-400 ${
+  `w-full px-4 py-3 border rounded-xl outline-none text-sm text-gray-900 placeholder-gray-400 transition focus:ring-2 focus:ring-cyan-400 ${
     hasError ? "border-red-400 focus:ring-red-300" : "border-gray-300"
   }`;
 
 const selectClass = (hasError) =>
-  `w-full px-4 py-3 border rounded-xl outline-none text-sm bg-white transition focus:ring-2 focus:ring-cyan-400 ${
+  `w-full px-4 py-3 border rounded-xl outline-none text-sm text-gray-900 bg-white transition focus:ring-2 focus:ring-cyan-400 ${
     hasError ? "border-red-400 focus:ring-red-300" : "border-gray-300"
   }`;
 

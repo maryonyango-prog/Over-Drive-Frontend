@@ -232,13 +232,13 @@ function ValuationHistory() {
               placeholder="Search by make, model or year..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-cyan-400 bg-white"
+              className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-900 placeholder-gray-400 outline-none focus:ring-2 focus:ring-cyan-400 bg-white"
             />
           </div>
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-cyan-400 bg-white text-gray-700"
+            className="px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-cyan-400 bg-white"
           >
             <option value="newest">Newest first</option>
             <option value="oldest">Oldest first</option>

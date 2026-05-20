@@ -13,17 +13,17 @@ const navItems = [
 // Mobile top bar — shown on small screens instead of the sidebar
 function MobileTopBar({ onMenuOpen }) {
   return (
-    <header className="lg:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200 sticky top-0 z-30">
+    <header className="lg:hidden flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-30">
       <span className="text-xl font-bold">
         <span className="text-cyan-400">Over</span>
-        <span className="text-gray-800">Drive</span>
+        <span className="text-gray-800 dark:text-gray-200">Drive</span>
       </span>
       <button
         onClick={onMenuOpen}
         aria-label="Open menu"
-        className="p-2 rounded-xl hover:bg-gray-100 transition"
+        className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition"
       >
-        <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+        <svg className="w-5 h-5 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
@@ -52,19 +52,19 @@ function MobileDrawer({ open, onClose }) {
       />
 
       {/* Drawer */}
-      <div className="fixed inset-y-0 left-0 w-64 bg-white z-50 flex flex-col shadow-xl lg:hidden">
+      <div className="fixed inset-y-0 left-0 w-64 bg-white dark:bg-gray-800 z-50 flex flex-col shadow-xl lg:hidden">
         {/* Logo + close */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 dark:border-gray-700">
           <span className="text-xl font-bold">
             <span className="text-cyan-400">Over</span>
-            <span className="text-gray-800">Drive</span>
+            <span className="text-gray-800 dark:text-gray-200">Drive</span>
           </span>
           <button
             onClick={onClose}
             aria-label="Close menu"
-            className="p-1.5 rounded-lg hover:bg-gray-100 transition"
+            className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
           >
-            <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -80,8 +80,8 @@ function MobileDrawer({ open, onClose }) {
               className={({ isActive }) =>
                 `block px-4 py-3 rounded-xl text-sm font-medium transition ${
                   isActive
-                    ? "bg-cyan-50 text-cyan-500"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    ? "bg-cyan-50 dark:bg-cyan-900/30 text-cyan-500"
+                    : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200"
                 }`
               }
             >
@@ -91,21 +91,21 @@ function MobileDrawer({ open, onClose }) {
         </nav>
 
         {/* User + logout */}
-        <div className="px-4 py-4 border-t border-gray-100">
+        <div className="px-4 py-4 border-t border-gray-100 dark:border-gray-700">
           {user && (
             <div className="flex items-center gap-3 px-4 py-3 mb-2">
               <div className="w-8 h-8 rounded-full bg-cyan-400 flex items-center justify-center text-white text-sm font-bold">
                 {user.name?.charAt(0).toUpperCase() || "U"}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-800 truncate">{user.name}</p>
-                <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                <p className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">{user.name}</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{user.email}</p>
               </div>
             </div>
           )}
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 hover:bg-red-50 hover:text-red-500 transition"
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-500 transition"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -123,7 +123,7 @@ function DashboardLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-[#F4F6F9]">
+    <div className="flex min-h-screen bg-[#F4F6F9] dark:bg-gray-900">
 
       {/* Sidebar — desktop only */}
       <div className="hidden lg:block">
