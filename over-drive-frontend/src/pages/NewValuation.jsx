@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../Context/AuthContext";
 import { vehicleService } from "../api/vehicleService";
@@ -16,6 +16,116 @@ const TRANSMISSIONS = ["Automatic", "Manual"];
 const BODY_TYPES = [
   "Sedan", "SUV", "Hatchback", "Pickup", "Van",
   "Coupe", "Convertible", "Wagon", "Bus", "Truck",
+];
+
+const MAX_FILES   = 6;
+const MAX_SIZE_MB = 5;
+const ACCEPTED    = ["image/jpeg", "image/png", "image/webp", "image/heic"];
+
+// ─── Image Upload Components ──────────────────────────────────────────────────
+
+function formatBytes(bytes) {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function ImageCard({ file, preview, onRemove }) {
+  return (
+    <div className="relative group rounded-xl overflow-hidden border border-gray-200 bg-gray-50 aspect-square">
+      <img
+        src={preview}
+        alt={file.name}
+        className="w-full h-full object-cover"
+      />
+      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+        <button
+          type="button"
+          onClick={onRemove}
+          className="w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center hover:bg-red-600 transition"
+          aria-label="Remove image"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div className="absolute bottom-1.5 left-1.5 bg-black/60 text-white text-xs px-1.5 py-0.5 rounded">
+        {formatBytes(file.size)}
+      </div>
+    </div>
+  );
+}
+
+function DropZone({ onFiles, disabled }) {
+  const [dragging, setDragging] = useState(false);
+  const inputRef = useRef(null);
+
+  const handleDrop = useCallback((e) => {
+    e.preventDefault();
+    setDragging(false);
+    if (disabled) return;
+    const files = Array.from(e.dataTransfer.files);
+    onFiles(files);
+  }, [onFiles, disabled]);
+
+  const handleDragOver = (e) => { e.preventDefault(); if (!disabled) setDragging(true); };
+  const handleDragLeave = () => setDragging(false);
+
+  const handleInput = (e) => {
+    const files = Array.from(e.target.files);
+    onFiles(files);
+    e.target.value = "";
+  };
+
+  return (
+    <div
+      onDrop={handleDrop}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onClick={() => !disabled && inputRef.current?.click()}
+      className={`border-2 border-dashed rounded-2xl p-10 text-center transition cursor-pointer ${
+        disabled
+          ? "border-gray-200 bg-gray-50 cursor-not-allowed opacity-60"
+          : dragging
+          ? "border-cyan-400 bg-cyan-50"
+          : "border-gray-300 hover:border-cyan-400 hover:bg-cyan-50/30"
+      }`}
+    >
+      <input
+        ref={inputRef}
+        type="file"
+        accept={ACCEPTED.join(",")}
+        multiple
+        className="hidden"
+        onChange={handleInput}
+        disabled={disabled}
+      />
+      <div className="w-14 h-14 rounded-full bg-cyan-50 flex items-center justify-center mx-auto mb-4">
+        <svg className="w-7 h-7 text-cyan-400" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+        </svg>
+      </div>
+      <p className="text-sm font-medium text-gray-700 mb-1">
+        {dragging ? "Drop your photos here" : "Drag & drop photos here"}
+      </p>
+      <p className="text-xs text-gray-400">
+        or <span className="text-cyan-500 font-medium">browse files</span>
+      </p>
+      <p className="text-xs text-gray-400 mt-2">
+        JPG, PNG, WEBP · Max {MAX_SIZE_MB}MB each · Up to {MAX_FILES} photos
+      </p>
+    </div>
+  );
+}
+
+const IMAGE_TIPS = [
+  "Front view — full vehicle visible",
+  "Rear view",
+  "Driver side profile",
+  "Interior — dashboard & seats",
+  "Engine bay",
+  "Any damage or notable features",
 ];
 
 // ─── Step indicator ───────────────────────────────────────────────────────────
@@ -82,7 +192,7 @@ const selectClass = (hasError) =>
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 
-const STEPS = ["Vehicle Details", "Condition & Specs", "Review & Submit"];
+const STEPS = ["Vehicle Details", "Image Upload", "Condition & Specs", "Review & Submit"];
 
 function NewValuation() {
   const { token } = useAuth();
@@ -107,11 +217,44 @@ function NewValuation() {
   });
 
   const [errors, setErrors] = useState({});
+  const [images, setImages] = useState([]); // { file, preview }
+  const [imageErrors, setImageErrors] = useState([]);
 
   const set = (field) => (e) => {
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
     setErrors((prev) => ({ ...prev, [field]: "" }));
     setApiError("");
+  };
+
+  const addFiles = useCallback((files) => {
+    const newErrors = [];
+    const valid = [];
+
+    files.forEach((file) => {
+      if (!ACCEPTED.includes(file.type)) {
+        newErrors.push(`${file.name}: unsupported format.`);
+        return;
+      }
+      if (file.size > MAX_SIZE_MB * 1024 * 1024) {
+        newErrors.push(`${file.name}: exceeds ${MAX_SIZE_MB}MB limit.`);
+        return;
+      }
+      if (images.length + valid.length >= MAX_FILES) {
+        newErrors.push(`Maximum ${MAX_FILES} photos allowed.`);
+        return;
+      }
+      valid.push({ file, preview: URL.createObjectURL(file) });
+    });
+
+    setImageErrors(newErrors);
+    setImages((prev) => [...prev, ...valid].slice(0, MAX_FILES));
+  }, [images]);
+
+  const removeImage = (index) => {
+    setImages((prev) => {
+      URL.revokeObjectURL(prev[index].preview);
+      return prev.filter((_, i) => i !== index);
+    });
   };
 
   // ── Validation per step ──────────────────────────────────────────────────
@@ -125,7 +268,8 @@ function NewValuation() {
       else if (Number(form.year) < 1900 || Number(form.year) > CURRENT_YEAR + 1)
         e.year = `Enter a year between 1900 and ${CURRENT_YEAR + 1}.`;
     }
-    if (s === 1) {
+    // Step 1 (Image Upload) is optional - no validation required
+    if (s === 2) {
       if (!form.condition)    e.condition = "Select a condition.";
       if (!form.mileage)      e.mileage   = "Mileage is required.";
       else if (isNaN(Number(form.mileage)) || Number(form.mileage) < 0)
@@ -155,8 +299,38 @@ function NewValuation() {
         engineSize: form.engineSize ? Number(form.engineSize) : undefined,
       };
       const result = await vehicleService.getValuation(payload, token);
-      // Navigate to image upload, passing the valuation ID
-      navigate("/upload", { state: { valuationId: result.id } });
+      
+      // Upload images if any were added
+      if (images.length > 0) {
+        try {
+          const formData = new FormData();
+          images.forEach(({ file }) => formData.append("images", file));
+          formData.append("valuationId", result.id);
+
+          const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true";
+
+          if (USE_MOCK) {
+            await new Promise((r) => setTimeout(r, 1500));
+          } else {
+            const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+            const res = await fetch(`${API_URL}/api/vehicles/images`, {
+              method: "POST",
+              headers: { Authorization: `Bearer ${token}` },
+              body: formData,
+            });
+
+            if (!res.ok) {
+              const data = await res.json();
+              throw new Error(data.message || "Image upload failed.");
+            }
+          }
+        } catch (uploadErr) {
+          // Log error but don't fail the whole process
+          console.error("Image upload error:", uploadErr);
+        }
+      }
+      
+      navigate(`/valuation/${result.id}`);
     } catch (err) {
       setApiError(
         err.message === "Failed to fetch"
@@ -235,9 +409,81 @@ function NewValuation() {
     </div>
   );
 
-  // ── Step 1: Condition & Specs ─────────────────────────────────────────────
+  // ── Step 1: Image Upload ──────────────────────────────────────────────────
 
   const renderStep1 = () => (
+    <div className="space-y-5">
+      <DropZone onFiles={addFiles} disabled={images.length >= MAX_FILES} />
+
+      {/* Error list */}
+      {imageErrors.length > 0 && (
+        <div className="space-y-1">
+          {imageErrors.map((e, i) => (
+            <p key={i} className="text-xs text-red-500 flex items-center gap-1">
+              <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              {e}
+            </p>
+          ))}
+        </div>
+      )}
+
+      {/* Image grid */}
+      {images.length > 0 && (
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-sm font-medium text-gray-700">
+              {images.length} / {MAX_FILES} photos added (optional)
+            </p>
+            <button
+              type="button"
+              onClick={() => { images.forEach(({ preview }) => URL.revokeObjectURL(preview)); setImages([]); }}
+              className="text-xs text-red-400 hover:text-red-600 transition"
+            >
+              Remove all
+            </button>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            {images.map(({ file, preview }, i) => (
+              <ImageCard
+                key={i}
+                file={file}
+                preview={preview}
+                onRemove={() => removeImage(i)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Tips */}
+      <div className="bg-gray-50 rounded-2xl px-5 py-4">
+        <h3 className="font-semibold text-gray-900 mb-2 text-sm">Photo tips</h3>
+        <p className="text-xs text-gray-500 mb-3">
+          Better photos = more accurate valuation. Try to include:
+        </p>
+        <ul className="space-y-1.5">
+          {IMAGE_TIPS.map((tip, i) => (
+            <li key={i} className="flex items-start gap-2 text-xs text-gray-600">
+              <div className="w-5 h-5 rounded-full bg-cyan-50 text-cyan-500 flex items-center justify-center flex-shrink-0 font-bold text-xs">
+                {i + 1}
+              </div>
+              {tip}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <p className="text-xs text-gray-400 text-center">
+        You can skip this step and proceed without images.
+      </p>
+    </div>
+  );
+
+  // ── Step 2: Condition & Specs ─────────────────────────────────────────────
+
+  const renderStep2 = () => (
     <div className="space-y-5">
       <Field label="Mileage (km) *" error={errors.mileage}>
         <input
@@ -306,9 +552,9 @@ function NewValuation() {
     </div>
   );
 
-  // ── Step 2: Review ────────────────────────────────────────────────────────
+  // ── Step 3: Review ────────────────────────────────────────────────────────
 
-  const renderStep2 = () => {
+  const renderStep3 = () => {
     const rows = [
       ["Make",         form.make],
       ["Model",        form.model],
@@ -374,6 +620,7 @@ function NewValuation() {
         {step === 0 && renderStep0()}
         {step === 1 && renderStep1()}
         {step === 2 && renderStep2()}
+        {step === 3 && renderStep3()}
 
         {/* Navigation */}
         <div className="flex justify-between mt-8 pt-6 border-t border-gray-100">
