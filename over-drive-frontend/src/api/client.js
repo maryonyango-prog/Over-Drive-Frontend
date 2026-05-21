@@ -4,11 +4,6 @@ const BASE_URL =
   import.meta.env.VITE_API_URL ||
   "https://over-drive-backend.onrender.com";
 
-// SINGLE source of truth
-function getToken() {
-  return localStorage.getItem("overdrive_token");
-}
-
 export async function apiClient(endpoint, options = {}) {
   const isFormData = options.body instanceof FormData;
 
@@ -18,7 +13,6 @@ export async function apiClient(endpoint, options = {}) {
     ...(options.headers || {}),
   };
 
-  // attach token ALWAYS if it exists
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
   }
