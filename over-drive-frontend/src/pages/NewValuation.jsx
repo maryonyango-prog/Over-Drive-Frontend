@@ -549,6 +549,33 @@ function NewValuation() {
           className={`${inputClass(errors.description)} resize-none`}
         />
       </Field>
+
+      {/* Register Vehicle CTA */}
+      <div className="mt-6 p-4 bg-gradient-to-r from-cyan-50 to-blue-50 rounded-xl border border-cyan-100">
+        <p className="text-sm text-gray-700 mb-3">
+          Ready to get your vehicle valuation? Register your vehicle details now.
+        </p>
+        <button
+          type="button"
+          onClick={handleSubmit}
+          disabled={loading}
+          className="w-full py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-600 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-sm transition flex items-center justify-center gap-2"
+        >
+          {loading ? (
+            <>
+              <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              Processing...
+            </>
+          ) : (
+            <>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Register Vehicle
+            </>
+          )}
+        </button>
+      </div>
     </div>
   );
 

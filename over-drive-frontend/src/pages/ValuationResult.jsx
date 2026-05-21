@@ -109,6 +109,9 @@ function ValuationResult() {
   const location     = useLocation();
   const navigate     = useNavigate();
   const { token }    = useAuth();
+  const [registering, setRegistering] = useState(false);
+  const [registerError, setRegisterError] = useState(null);
+  const [registerSuccess, setRegisterSuccess] = useState(false);
 
   // If navigated from NewValuation, the result is already in location.state
   const [valuation, setValuation] = useState(location.state?.valuation || null);
@@ -270,20 +273,93 @@ function ValuationResult() {
         </div>
       )}
 
+      {/* ── Register success message ── */}
+      {registerSuccess && (
+        <div className="bg-green-50 border border-green-200 text-green-700 rounded-2xl p-4 mb-5 flex items-center gap-3">
+          <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div>
+            <p className="text-sm font-semibold">Vehicle registered successfully!</p>
+            <p className="text-xs text-green-600 mt-0.5">This vehicle has been added to your garage.</p>
+          </div>
+        </div>
+      )}
+
+      {/* ── Register error message ── */}
+      {registerError && (
+        <div className="bg-red-50 border border-red-200 text-red-700 rounded-2xl p-4 mb-5 flex items-center gap-3">
+          <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div>
+            <p className="text-sm font-semibold">Registration failed</p>
+            <p className="text-xs text-red-600 mt-0.5">{registerError}</p>
+          </div>
+        </div>
+      )}
+
       {/* ── Actions ── */}
-      <div className="flex gap-3">
-        <Link
-          to="/valuate"
-          className="flex-1 text-center py-3 rounded-xl border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
+      <div className="space-y-3">
+        <button
+          onClick={async () => {
+            setRegistering(true);
+            setRegisterError(null);
+            setRegisterSuccess(false);
+            try {
+              const vehicleData = {
+                make: valuation.make,
+                model: valuation.model,
+                year: valuation.year,
+                condition: valuation.condition,
+                mileage: valuation.mileage,
+                bodyType: valuation.bodyType,
+                fuelType: valuation.fuelType,
+                transmission: valuation.transmission,
+                engineSize: valuation.engineSize,
+                color: valuation.color,
+                estimatedValue: valuation.estimatedValue,
+              };
+              await vehicleService.registerVehicle(vehicleData, token);
+              setRegisterSuccess(true);
+            } catch (err) {
+              setRegisterError(err.message || "Failed to register vehicle");
+            } finally {
+              setRegistering(false);
+            }
+          }}
+          disabled={registering || registerSuccess}
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-green-500 hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold text-sm transition"
         >
-          New Valuation
-        </Link>
-        <Link
-          to="/history"
-          className="flex-1 text-center py-3 rounded-xl bg-cyan-400 hover:bg-cyan-500 text-black font-semibold text-sm transition"
-        >
-          View History
-        </Link>
+          {registering ? (
+            <>
+              <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              Registering...
+            </>
+          ) : (
+            <>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Register Vehicle
+            </>
+          )}
+        </button>
+
+        <div className="flex gap-3">
+          <Link
+            to="/valuate"
+            className="flex-1 text-center py-3 rounded-xl border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
+          >
+            New Valuation
+          </Link>
+          <Link
+            to="/history"
+            className="flex-1 text-center py-3 rounded-xl bg-cyan-400 hover:bg-cyan-500 text-black font-semibold text-sm transition"
+          >
+            View History
+          </Link>
+        </div>
       </div>
     </div>
   );

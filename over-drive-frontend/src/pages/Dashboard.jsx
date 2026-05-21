@@ -152,7 +152,7 @@ function Dashboard() {
       <div className="flex items-start justify-between mb-8 flex-wrap gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            {greeting}, {user?.name?.split(" ")[0] || "there"} 👋
+            {greeting} {user?.name?.split(" ")[0] || "there"} 👋
           </h1>
           <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm">
             Here's an overview of your vehicle valuations.
