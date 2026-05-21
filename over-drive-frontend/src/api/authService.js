@@ -1,5 +1,15 @@
 import { apiClient } from "./client";
 
+const normalize = (res) => {
+  // Handles all possible backend shapes safely
+  const data = res?.data ?? res;
+
+  return {
+    user: data?.user ?? null,
+    access_token: data?.access_token ?? null,
+  };
+};
+
 export const authService = {
   login: async (email, password) => {
     const res = await apiClient("/api/auth/login", {
@@ -7,12 +17,7 @@ export const authService = {
       body: JSON.stringify({ email, password }),
     });
 
-    const data = res?.data || res; // 🔥 normalize
-
-    return {
-      user: data?.user,
-      access_token: data?.access_token,
-    };
+    return normalize(res);
   },
 
   register: async (name, email, password) => {
@@ -21,12 +26,7 @@ export const authService = {
       body: JSON.stringify({ name, email, password }),
     });
 
-    const data = res?.data || res; // 🔥 normalize
-
-    return {
-      user: data?.user,
-      access_token: data?.access_token,
-    };
+    return normalize(res);
   },
 
   getMe: async () => {
@@ -34,8 +34,8 @@ export const authService = {
       method: "GET",
     });
 
-    const data = res?.data || res;
+    const data = res?.data ?? res;
 
-    return data?.user;
+    return data?.user ?? null;
   },
 };
