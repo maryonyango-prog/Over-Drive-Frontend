@@ -364,5 +364,16 @@ function ValuationResult() {
     </div>
   );
 }
+function normalizeValuation(v) {
+  return {
+    ...v,
+    engineSize: v.engine_size,
+    bodyType: v.body_type,
+    fuelType: v.fuel_type,
+    transmission: v.transmission,
+    priceRange: v.price_range,
+    estimatedValue: v.estimated_value,
+  };
+}
 
 export default ValuationResult;

@@ -126,7 +126,7 @@ function ImageUpload() {
   const location  = useLocation();
 
   // If navigated from NewValuation, the valuation ID is in state
-  const valuationId = location.state?.valuationId;
+  const valuationId = location.state?.vehicleId;
 
   const [images, setImages]     = useState([]); // { file, preview }
   const [errors, setErrors]     = useState([]);
@@ -172,7 +172,7 @@ function ImageUpload() {
     try {
       const formData = new FormData();
       images.forEach(({ file }) => formData.append("images", file));
-      if (valuationId) formData.append("valuationId", valuationId);
+      if (valuationId) formData.append("vehicleId", vehicleId);
 
       const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true";
 
@@ -184,7 +184,7 @@ function ImageUpload() {
       }
 
       const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
-      const res = await fetch(`${API_URL}/api/vehicles/images`, {
+      const res = await fetch(`${API_URL}/api/vehicles/${valuationId}/images`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
@@ -195,7 +195,7 @@ function ImageUpload() {
         throw new Error(data.message || "Upload failed.");
       }
 
-      navigate(valuationId ? `/valuation/${valuationId}` : "/dashboard");
+      navigate(valuationId ? `/valuation/${vehicleId}` : "/dashboard");
     } catch (err) {
       setUploadError(
         err.message === "Failed to fetch"

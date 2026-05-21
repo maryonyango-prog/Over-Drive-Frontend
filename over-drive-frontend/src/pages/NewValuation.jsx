@@ -289,57 +289,64 @@ function NewValuation() {
   const handleBack = () => setStep((s) => s - 1);
 
   const handleSubmit = async () => {
-    setLoading(true);
-    setApiError("");
-    try {
-      const payload = {
-        ...form,
-        year:     Number(form.year),
-        mileage:  Number(form.mileage),
-        engineSize: form.engineSize ? Number(form.engineSize) : undefined,
-      };
-      const result = await vehicleService.getValuation(payload, token);
-      
-      // Upload images if any were added
-      if (images.length > 0) {
-        try {
-          const formData = new FormData();
-          images.forEach(({ file }) => formData.append("images", file));
-          formData.append("valuationId", result.id);
+  setLoading(true);
+  setApiError("");
 
-          const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true";
+  try {
+    const payload = {
+      ...form,
+      year: Number(form.year),
+      mileage: Number(form.mileage),
+      engineSize: form.engineSize ? Number(form.engineSize) : undefined,
+    };
 
-          if (USE_MOCK) {
-            await new Promise((r) => setTimeout(r, 1500));
-          } else {
-            const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
-            const res = await fetch(`${API_URL}/api/vehicles/images`, {
-              method: "POST",
-              headers: { Authorization: `Bearer ${token}` },
-              body: formData,
-            });
+    // 1. CREATE VEHICLE FIRST
+    const vehicle = await vehicleService.registerVehicle(payload, token);
+    const vehicleId = vehicle.vehicle.id;
 
-            if (!res.ok) {
-              const data = await res.json();
-              throw new Error(data.message || "Image upload failed.");
-            }
-          }
-        } catch (uploadErr) {
-          // Log error but don't fail the whole process
-          console.error("Image upload error:", uploadErr);
-        }
+    // 2. UPLOAD IMAGES
+    if (images.length > 0) {
+  const API_URL =
+    import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+  for (const { file } of images) {
+    const formData = new FormData();
+
+    // MUST match backend request.files.get("image")
+    formData.append("image", file);
+
+    const response = await fetch(
+      `${API_URL}/api/vehicle/${vehicleId}/upload_image`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
       }
-      
-      navigate(`/valuation/${result.id}`);
-    } catch (err) {
-      setApiError(
-        err.message === "Failed to fetch"
-          ? "Cannot reach the server. Make sure the backend is running."
-          : err.message || "Valuation failed. Please try again."
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        errorData.error || "Image upload failed"
       );
-      setLoading(false);
     }
-  };
+  }
+}
+
+    // 3. RUN ANALYSIS / VALUATION
+    const result = await vehicleService.analyzeVehicle(vehicleId, token);
+    
+
+    navigate(`/valuation/${vehicleId}`);
+
+  } catch (err) {
+    setApiError(err.message || "Something went wrong");
+  } finally {
+    setLoading(false);
+  }
+};
 
   // ── Step 0: Vehicle Details ───────────────────────────────────────────────
 

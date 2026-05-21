@@ -1,8 +1,3 @@
-/**
- * Base API client
- * Handles JSON + FormData correctly
- */
-
 const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 export async function apiClient(endpoint, options = {}, token = null) {
@@ -10,36 +5,41 @@ export async function apiClient(endpoint, options = {}, token = null) {
 
   const headers = {
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    ...options.headers,
+    ...(options.headers || {}),
   };
 
-  // ONLY set JSON header when NOT uploading files
   if (!isFormData) {
     headers["Content-Type"] = "application/json";
   }
 
-  const config = {
-    ...options,
-    headers,
-  };
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30000);
 
-  const response = await fetch(`${BASE_URL}${endpoint}`, config);
+  try {
+    const response = await fetch(`${BASE_URL}${endpoint}`, {
+      ...options,
+      headers,
+      signal: controller.signal,
+    });
 
-  let data;
-  const contentType = response.headers.get("content-type");
+    const contentType = response.headers.get("content-type");
+    let data = null;
 
-  if (contentType && contentType.includes("application/json")) {
-    data = await response.json();
-  } else {
-    data = await response.text();
+    if (contentType?.includes("application/json")) {
+      data = await response.json().catch(() => null);
+    } else {
+      data = await response.text().catch(() => null);
+    }
+
+    if (!response.ok) {
+      const message =
+        (data && (data.message || data.error)) ||
+        `Request failed (${response.status})`;
+      throw new Error(message);
+    }
+
+    return data;
+  } finally {
+    clearTimeout(timeout);
   }
-
-  if (!response.ok) {
-    const message =
-      (typeof data === "object" && (data.message || data.error)) ||
-      `Request failed with status ${response.status}`;
-    throw new Error(message);
-  }
-
-  return data;
 }
