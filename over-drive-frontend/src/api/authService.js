@@ -7,9 +7,11 @@ export const authService = {
       body: JSON.stringify({ email, password }),
     });
 
+    const data = res?.data || res; // 🔥 normalize
+
     return {
-      user: res.user,
-      token: res.access_token,
+      user: data?.user,
+      access_token: data?.access_token,
     };
   },
 
@@ -19,17 +21,21 @@ export const authService = {
       body: JSON.stringify({ name, email, password }),
     });
 
+    const data = res?.data || res; // 🔥 normalize
+
     return {
-      user: res.user,
-      token: res.access_token,
+      user: data?.user,
+      access_token: data?.access_token,
     };
   },
 
-  getMe: async (token) => {
+  getMe: async () => {
     const res = await apiClient("/api/auth/me", {
       method: "GET",
-    }, token);
+    });
 
-    return res.user;
+    const data = res?.data || res;
+
+    return data?.user;
   },
 };

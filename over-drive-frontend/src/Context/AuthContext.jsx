@@ -47,40 +47,52 @@ export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(AuthReducer, initialState);
 
   const login = useCallback(async (email, password) => {
-    dispatch(loginStart());
-    try {
-      // authService.login calls POST /api/auth/login
-      // Expected response: { token, user }
-      const data = await authService.login(email, password);
+  dispatch(loginStart());
 
-      localStorage.setItem(TOKEN_KEY, data.token);
-      localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+  try {
+    const data = await authService.login(email, password);
 
-      dispatch(loginSuccess(data.user));
-      return { success: true };
-    } catch (err) {
-      dispatch(loginFailure(err.message));
-      return { success: false, error: err.message };
+    const token = data?.data?.access_token;
+    const user = data?.data?.user;
+
+    if (!token) {
+      throw new Error("Login failed: token missing from server response");
     }
-  }, []);
+
+    localStorage.setItem(TOKEN_KEY, token);
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
+
+    dispatch(loginSuccess(user));
+    return { success: true };
+  } catch (err) {
+    dispatch(loginFailure(err.message));
+    return { success: false, error: err.message };
+  }
+}, []);
 
   const register = useCallback(async (name, email, password) => {
-    dispatch(registerStart());
-    try {
-      // authService.register calls POST /api/auth/register
-      // Expected response: { token, user }
-      const data = await authService.register(name, email, password);
+  dispatch(registerStart());
 
-      localStorage.setItem(TOKEN_KEY, data.token);
-      localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+  try {
+    const data = await authService.register(name, email, password);
 
-      dispatch(registerSuccess(data.user));
-      return { success: true };
-    } catch (err) {
-      dispatch(registerFailure(err.message));
-      return { success: false, error: err.message };
+    const token = data?.data?.access_token;
+    const user = data?.data?.user;
+
+    if (!token) {
+      throw new Error("Register failed: token missing from server response");
     }
-  }, []);
+
+    localStorage.setItem(TOKEN_KEY, token);
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
+
+    dispatch(registerSuccess(user));
+    return { success: true };
+  } catch (err) {
+    dispatch(registerFailure(err.message));
+    return { success: false, error: err.message };
+  }
+}, []);
 
   // Used by OAuthCallback — stores token + user coming back from Google/Facebook
   const loginWithToken = useCallback((token, user) => {

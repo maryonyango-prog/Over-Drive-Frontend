@@ -1,18 +1,27 @@
-import { authStorage } from "./authStorage";
+import { getToken } from "../utils/authToken";
 
 const BASE_URL =
   import.meta.env.VITE_API_URL ||
   "https://over-drive-backend.onrender.com";
 
+// SINGLE source of truth
+function getToken() {
+  return localStorage.getItem("overdrive_token");
+}
+
 export async function apiClient(endpoint, options = {}) {
   const isFormData = options.body instanceof FormData;
 
-  const token = authStorage.getToken(); // 🔥 AUTO FETCH TOKEN
+  const token = getToken();
 
   const headers = {
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...(options.headers || {}),
   };
+
+  // attach token ALWAYS if it exists
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
 
   if (!isFormData) {
     headers["Content-Type"] = "application/json";
@@ -38,10 +47,9 @@ export async function apiClient(endpoint, options = {}) {
     }
 
     if (!response.ok) {
-      const message =
-        (data && (data.message || data.error)) ||
-        `Request failed (${response.status})`;
-      throw new Error(message);
+      throw new Error(
+        data?.message || data?.error || `Request failed (${response.status})`
+      );
     }
 
     return data;
