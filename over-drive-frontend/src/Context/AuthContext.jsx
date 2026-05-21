@@ -76,8 +76,8 @@ export const AuthProvider = ({ children }) => {
   try {
     const data = await authService.register(name, email, password);
 
-    const token = data?.data?.access_token;
-    const user = data?.data?.user;
+    const token = data?.access_token;
+    const user = data?.user;
 
     if (!token) {
       throw new Error("Register failed: token missing from server response");
