@@ -1,7 +1,13 @@
-const BASE_URL = import.meta.env.VITE_API_URL || "https://over-drive-backend.onrender.com"
+import { authStorage } from "./authStorage";
 
-export async function apiClient(endpoint, options = {}, token = null) {
+const BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  "https://over-drive-backend.onrender.com";
+
+export async function apiClient(endpoint, options = {}) {
   const isFormData = options.body instanceof FormData;
+
+  const token = authStorage.getToken(); // 🔥 AUTO FETCH TOKEN
 
   const headers = {
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -23,7 +29,7 @@ export async function apiClient(endpoint, options = {}, token = null) {
     });
 
     const contentType = response.headers.get("content-type");
-    let data = null;
+    let data;
 
     if (contentType?.includes("application/json")) {
       data = await response.json().catch(() => null);
