@@ -1,7 +1,6 @@
 import { apiClient } from "./client";
 
 const normalize = (res) => {
-  // Handles all possible backend shapes safely
   const data = res?.data ?? res;
 
   return {
