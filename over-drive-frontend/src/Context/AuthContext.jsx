@@ -9,11 +9,15 @@ import {
 } from "./AuthActions";
 import { authService } from "../api/authService";
 
+// ─────────────────────────────
+// SINGLE SOURCE OF TRUTH
+// ─────────────────────────────
 const TOKEN_KEY = "overdrive_token";
-const USER_KEY  = "overdrive_user";
+const USER_KEY = "overdrive_user";
 
-// ─── Helpers ───────────────────────────────
-
+// ─────────────────────────────
+// HELPERS
+// ─────────────────────────────
 const getStoredToken = () => localStorage.getItem(TOKEN_KEY);
 
 const getStoredUser = () => {
@@ -24,8 +28,9 @@ const getStoredUser = () => {
   }
 };
 
-// ─── Initial state ─────────────────────────
-
+// ─────────────────────────────
+// INITIAL STATE
+// ─────────────────────────────
 const initialState = {
   user: getStoredUser(),
   token: getStoredToken(),
@@ -34,12 +39,14 @@ const initialState = {
   error: null,
 };
 
-// ─── Context ────────────────────────────────
-
+// ─────────────────────────────
+// CONTEXT
+// ─────────────────────────────
 export const AuthContext = createContext(initialState);
 
-// ─── Provider ───────────────────────────────
-
+// ─────────────────────────────
+// PROVIDER
+// ─────────────────────────────
 export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(AuthReducer, initialState);
 
@@ -50,7 +57,6 @@ export const AuthProvider = ({ children }) => {
     try {
       const data = await authService.login(email, password);
 
-      // ✅ FIXED: use token (NOT access_token)
       const token = data?.token;
       const user = data?.user;
 
@@ -77,7 +83,6 @@ export const AuthProvider = ({ children }) => {
     try {
       const data = await authService.register(name, email, password);
 
-      // ✅ FIXED: use token
       const token = data?.token;
       const user = data?.user;
 
@@ -97,7 +102,7 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  // OAuth login
+  // LOGIN WITH TOKEN (OAuth etc.)
   const loginWithToken = useCallback((token, user) => {
     localStorage.setItem(TOKEN_KEY, token);
     localStorage.setItem(USER_KEY, JSON.stringify(user));
@@ -143,8 +148,9 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// ─── Hook ────────────────────────────────
-
+// ─────────────────────────────
+// HOOK
+// ─────────────────────────────
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) throw new Error("useAuth must be used within AuthProvider");

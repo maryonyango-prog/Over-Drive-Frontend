@@ -19,15 +19,21 @@ const AuthReducer = (state = initialState, action) => {
       };
 
     case AUTH_ACTIONS.LOGIN_SUCCESS:
-    case AUTH_ACTIONS.REGISTER_SUCCESS:
+    case AUTH_ACTIONS.REGISTER_SUCCESS: {
+      const { user, token } = action.payload;
+
+      // 🔥 store token for API client
+      localStorage.setItem("token", token);
+
       return {
         ...state,
-        user: action.payload.user,
-        token: action.payload.token,
+        user,
+        token,
         isAuthenticated: true,
         loading: false,
         error: null,
       };
+    }
 
     case AUTH_ACTIONS.LOGIN_FAILURE:
     case AUTH_ACTIONS.REGISTER_FAILURE:
@@ -41,6 +47,8 @@ const AuthReducer = (state = initialState, action) => {
       };
 
     case AUTH_ACTIONS.LOGOUT:
+      localStorage.removeItem("token");
+
       return {
         ...state,
         user: null,

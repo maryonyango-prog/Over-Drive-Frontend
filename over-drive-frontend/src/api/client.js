@@ -1,15 +1,12 @@
-import { getToken } from "../utils/authToken";
-
 const BASE_URL =
   import.meta.env.VITE_API_URL ||
-  "https://over-drive-backend.onrender.com";
-
-console.log("API BASE URL:", BASE_URL);
+  "http://127.0.0.1:5000";
 
 export async function apiClient(endpoint, options = {}) {
   const isFormData = options.body instanceof FormData;
 
-  const token = getToken();
+  // ✅ SINGLE SOURCE OF TRUTH (IMPORTANT FIX)
+  const token = localStorage.getItem("overdrive_token");
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 30000);
@@ -24,7 +21,7 @@ export async function apiClient(endpoint, options = {}) {
       headers["Authorization"] = `Bearer ${token}`;
     }
 
-    // Only JSON header if not FormData
+    // Only set JSON header if NOT FormData
     if (!isFormData) {
       headers["Content-Type"] = "application/json";
     }
