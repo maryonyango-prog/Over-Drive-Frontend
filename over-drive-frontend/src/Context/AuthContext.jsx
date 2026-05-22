@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }) => {
   try {
     const data = await authService.login(email, password);
 
-    console.log("LOGIN RESPONSE:", data); // keep for debugging
+    console.log("LOGIN RESPONSE:", data);
 
     const token = data?.access_token;
     const user = data?.user;
@@ -65,13 +65,14 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem(USER_KEY, JSON.stringify(user));
 
     dispatch(loginSuccess(user));
+
     return { success: true };
   } catch (err) {
     dispatch(loginFailure(err.message));
+
     return { success: false, error: err.message };
   }
 }, []);
-
   const register = useCallback(async (name, email, password) => {
   dispatch(registerStart());
 
