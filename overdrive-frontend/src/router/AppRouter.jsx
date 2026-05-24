@@ -7,28 +7,26 @@ import Register from '../pages/Register';
 import Dashboard from '../pages/Dashboard';
 import NewValuation from '../pages/NewValuation';
 import History from '../pages/History';
-import ValuationResult from '../pages/ValuationResult';  
+import ValuationResult from '../pages/ValuationResult';
+import Landing from '../pages/Landing';
 
 export default function AppRouter() {
   return (
     <Routes>
-      {/* Public Routes */}
+      <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
-      {/* Protected Routes */}
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/new-valuation" element={<NewValuation />} />
           <Route path="/history" element={<History />} />
-          <Route path="/valuation-result" element={<ValuationResult />} />   
+          <Route path="/valuation-result" element={<ValuationResult />} />
         </Route>
       </Route>
 
-      {/* Redirects */}
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
